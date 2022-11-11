@@ -1,10 +1,16 @@
+import { useContext } from 'react'
+import FeedbackContext from '../context/FeedbackContext'
+
+
 import {useState} from "react"
 import RatingSelect from "./RatingSelect";
 import Button from "./shared/Button";
 
 import Card from "./shared/Card"
 
-function FeedbackForm({handleAdd}) {
+function FeedbackForm() {
+
+    const { addFeedback } = useContext(FeedbackContext);
 
     const [btnDisabled, setBtnDisabled] = useState(true)
     const[text, setText] = useState();
@@ -15,7 +21,7 @@ function FeedbackForm({handleAdd}) {
         if (e.target.value === '') {
           setBtnDisabled(true)
           setMessage(null)
-        } else if (e.target.value.trim().length < 10) { // 👈 check for less than 10
+        } else if (e.target.value.trim().length < 10) { // check for less than 10
           setMessage('Text must be at least 10 characters')
           setBtnDisabled(true)
         } else {
@@ -35,7 +41,7 @@ function FeedbackForm({handleAdd}) {
               rating,
             }
       
-            handleAdd(newFeedback)
+            addFeedback(newFeedback)
     
             setBtnDisabled(true) // reset disabled
             setRating(10) // set rating back to 10
