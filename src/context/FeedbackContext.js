@@ -1,43 +1,102 @@
-import { createContext, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid';
+import { createContext, useState, useEffect } from 'react'
+
+//Below import can be used when will be generating random id manually
+//import { v4 as uuidv4 } from 'uuid';
 
 
 const FeedbackContext = createContext();
 
 export const FeedbackProvider = ({ children }) => {
 
-    const [feedback, setFeedback] = useState([{
-        id: 1,
-        text: 'This feedback is from context',
-        rating: 10
-    }, {
-        id: 2,
-        text: 'This feedback is from contextsss',
-        rating: 4
-    }]);
-
+    const [isLoading, setIsLoading] = useState(true)
+    const [feedback, setFeedback] = useState([]);
     const [feedbackEdit, setFeedbackEdit] = useState({
         item: {},
         edit: false,
     })
 
-    //delete feedback
-    const deleteFeedback = (id) => {
-        if (window.confirm('Are you sure you want to delete ?')) {
+    // calling Fetch feedback API
+    useEffect(() => {
+        fetchFeedback()
+    }, [])
+
+    // Fetch feedback
+    const fetchFeedback = async () => {
+        const response = await fetch(`/feedback?_sort=id&_order=desc`)
+        const data = await response.json()
+
+        setFeedback(data)
+        setIsLoading(false)
+    }
+
+    // // Delete feedback without back end
+    // const deleteFeedback = (id) => {
+    //     if (window.confirm('Are you sure you want to delete ?')) {
+    //         setFeedback(feedback.filter((item) => item.id !== id))
+    //     }
+    // }
+
+    // Delete feedback
+    const deleteFeedback = async (id) => {
+        if (window.confirm('Are you sure you want to delete?')) {
+            await fetch(`/feedback/${id}`, {
+                method: 'DELETE'
+            })
+
             setFeedback(feedback.filter((item) => item.id !== id))
         }
     }
 
-    //add feed back
-    const addFeedback = (newFeedback) => {
-        newFeedback.id = uuidv4();
-        setFeedback([newFeedback, ...feedback])
+    //Add feed back without back end
+    // const addFeedback = (newFeedback) => {
+    //     newFeedback.id = uuidv4();
+    //     setFeedback([newFeedback, ...feedback])
+    // }
+
+
+    // Add feedback
+    const addFeedback = async (newFeedback) => {
+        const response = await fetch('/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newFeedback),
+        })
+
+        const data = await response.json()
+
+        setFeedback([data, ...feedback])
     }
 
-    const updateFeedback = (id, updItem) => {
-        setFeedback(
-            feedback.map((item) => (item.id === id ? { ...item, ...updItem } : item))
-        )
+    //Update feedback without back end
+    // const updateFeedback = (id, updItem) => {
+    //     setFeedback(
+    //         feedback.map((item) => (item.id === id ? { ...item, ...updItem } : item))
+    //     )
+    // }
+
+
+    // Update feedback item 
+    const updateFeedback = async (id, updItem) => {
+        const response = await fetch(`/feedback/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updItem),
+        })
+
+        const data = await response.json()
+
+        // NOTE: no need to spread data and item
+        setFeedback(feedback.map((item) => (item.id === id ? data : item)))
+
+        // this part allow to add a feedback after editing
+        setFeedbackEdit({
+            item: {},
+            edit: false,
+        })
     }
 
     //set item to be updated
@@ -56,7 +115,8 @@ export const FeedbackProvider = ({ children }) => {
             addFeedback,
             editFeedback,
             feedbackEdit,
-            updateFeedback
+            updateFeedback,
+            isLoading,
         }}>
             {children}
         </FeedbackContext.Provider>
