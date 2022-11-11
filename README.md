@@ -1,3 +1,22 @@
+# React Feedback App
+
+This is a simple react feedback aaplication.It allows users to add, update and delete feedback. It uses a mock REST api with json-server.
+
+This project goes over all of the fundamentals of React including...
+
+- Components
+- JSX
+- Props (proptypes, defaultprops, etc)
+- State (Component & App Level)
+- Styling
+- Handling Events
+- Lists & Keys
+- Forms
+- Context API
+- HTTP Requests
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
